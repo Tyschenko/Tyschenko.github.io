@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Download file</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+        }
+        .logo img {
+            width: 272px;
+        }
+        .note {
+            font-size: 18px;
+        text-align: center;
+            color: #202124;
+        }
+        .red-square {
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 8px;
+            cursor: pointer;
+            position: absolute;
+            top: 59%;
+            right: 17%;
+            transition: transform 0.1s ease;
+        }
+        .red-square:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+
+<div class="note">Click on Red icon to download a file</div>
+
+<div class="red-square" ondblclick="triggerDownload()"></div>
+
+<script>
+    function triggerDownload() {
+        const fileUrl = "https://tyschenko.github.io/file.txt";
+        const link = document.createElement("a");
+        link.href = fileUrl;
+        link.download = fileUrl.split("/").pop();
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
+</body>
+</html>
