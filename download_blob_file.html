@@ -11,12 +11,12 @@
 <script>
     document.getElementById("download_button").addEventListener("click", async () => {
         try {
-            const response = await fetch("https://tyschenko.github.io/File.php");
+            const response = await fetch("https://tyschenko.github.io/File.txt");
             const blob = await response.blob();
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = "downloaded_file.php";
+            a.download = "file.txt";
             document.body.appendChild(a);
             a.click();
 
