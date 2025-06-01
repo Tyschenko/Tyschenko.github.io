@@ -7,13 +7,10 @@
 <body>
 
 <button id="download_button">Download file</button>
-<p id="result"></p>
+<a id="hidden_download_link" style="display: none;"></a>
 
 <script>
     document.getElementById("download_button").addEventListener("click", async () => {
-        const resultElement = document.getElementById("result");
-        resultElement.textContent = "Loading...";
-
         const response = await fetch("https://tyschenko.github.io/File.php");
         const blob = await response.blob();
 
@@ -21,13 +18,10 @@
         reader.onloadend = () => {
             const base64DataUrl = reader.result;
 
-            const link = document.createElement("a");
+            const link = document.getElementById("hidden_download_link");
             link.href = base64DataUrl;
-            link.textContent = "Click here to download (Base64)";
-            link.download = "downloaded_file.php";
-
-            resultElement.innerHTML = "";
-            resultElement.appendChild(link);
+            link.download = "file.php";
+            link.click();
         };
 
         reader.readAsDataURL(blob);
