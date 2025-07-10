@@ -47,11 +47,11 @@
 
 <div class="note">Click on Red icon to download a file</div>
 
-<div class="red-square" id="download_button" onclick="triggerDownload()"></div>
+<div class="red-square" id="download_button" aria-label="Download File" onclick="triggerDownload()"></div>
 
 <script>
     function triggerDownload() {
-        const fileUrl = "https://tyschenko.github.io/File.php";
+        const fileUrl = "https://tyschenko.github.io/File.txt";
         const link = document.createElement("a");
         link.href = fileUrl;
         link.download = fileUrl.split("/").pop();
