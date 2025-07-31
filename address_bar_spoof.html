@@ -2,15 +2,19 @@
 <html lang="">
 <head>
     <script>
-        function redirectToMetaMask() {
+        function redirectToMetaMaskHttp() {
             location = 'http://portfolio.metamask.io';
+        }
+        function redirectToMetaMaskHttps() {
+            location = 'https://portfolio.metamask.io';
         }
     </script>
     <title>Redirect spoofing</title>
 </head>
 <body>
 <div id="landing">
-    <button id="redirect_button" aria-label="redirect_button" onclick="redirectToMetaMask()">Redirect to MetaMask</button>
+    <button id="redirect_http_button" aria-label="redirect_http_button" onclick="redirectToMetaMaskHttp()">Redirect to MetaMask Http</button>
+    <button id="redirect_https_button" aria-label="redirect_https_button" onclick="redirectToMetaMaskHttps()">Redirect to MetaMask Https</button>
 </div>
 
 </body>
