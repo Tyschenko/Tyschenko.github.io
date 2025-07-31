@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="UTF-8">
+			<meta name="viewport" content="width=device-width, initial-scale=1.0">
+			<meta http-equiv="X-UA-Compatible" content="ie=edge">
+			<title>CIRT Reports</title>
+			<link rel="stylesheet" href="./style.css" crossorigin="anonymous">
+			<script type="text/javascript" src="./index.js"></script>
+		</head>
+		<body>
+			<iframe style="display:none" id="nop" src="">
+				<html> <head></head> <body></body> </html>
+			</iframe>
+			<h2>Mobile Security QA Manual Testing</h2>
+			<p>Toggle to get the description</p>
+
+			<script>
+				const link = 'link';
+				const button = 'button';
+				function createComponent({header, name, expectedBehaviour, appVulnerableIf, url, type, functionName}) {
+					return `
+						<div>
+							<button class="collapsible">${header}</button>
+							<div class="content">
+								<dl>
+									<dt><pre>Expected behaviour is...</pre></dt>
+									${expectedBehaviour.map((value) => `<dd><pre>${value}</pre></dd>`).join('')}
+									<dt><pre>We know we are vulnerable if...</pre></dt>
+									${appVulnerableIf.map((value) => `<dd><pre>${value}</pre></dd>`).join('')}
+									${type === 'link' ? `<a href="${url}" class="button button2">${name}</a>` : `<button class="button button2" onclick=${functionName}>${name}</button>`}
+								</dl>
+							</div>
+							<br />
+						</div>
+					`;
+				}
+				
+				const components = [
+					createComponent({
+						header: 'Camera Access',
+						name: 'Camera',
+						expectedBehaviour: [
+							'A modal should always show up when someone is requesting camera access',
+							'If granted, app can access camera',
+							'If denied, app should not be able to access your camera',
+						],
+						appVulnerableIf: [
+							'There is no modal to ask you for your camera permission & your camera is accessed'
+						],
+						url: './html/camera.html',
+						type: link
+					}),
+					createComponent({
+						header: 'Spoof transaction domain while holding new tab',
+						name: 'Spoof transaction domain while holding new tab',
+						expectedBehaviour: [
+							'Create a new tab then return back to this page.',
+							'Visit the page, connect your wallet, then click send transaction. This will trigger a transaction request every few seconds',
+							'Navigate to your tab switcher and hold your finger on another tab',
+							'The transaction origin domain should not change.',
+							'https://github.com/MetaMask/mobile-planning/issues/848'
+						],
+						appVulnerableIf: [
+							'The transaction domain changes to the domain of the tab you are holding when a request comes in while holding another tab'
+						],
+						url: './html/tab-spoof-poc.html',
+						type: link
+					}),
+					createComponent({
+						header: 'Universal XSS',
+						name: 'Universal XSS',
+						expectedBehaviour: [
+							'The page will redirect to an invalid page and in a few seconds',
+							'You should see the browser error screen'
+						],
+						appVulnerableIf: ['You see an alert box on the screen'],
+						url: './html/malicious.html',
+						type: link
+					}),
+					createComponent({
+						header: 'Spoof Address Bar Update',
+						name: 'Spoof Address Bar Update',
+						expectedBehaviour: [
+							'The page will reload and show new content',
+							'The address bar should still be the researchers url and not update',
+							'This site will navigate to <cite>www.microsoft.com</cite> after some time.'
+						],
+						appVulnerableIf: ['The address bar updates to <cite>wwww.microsoft.com</cite> while still displaying our sites content'],
+						url: './html/microsoft-addres-bar-spoof.html',
+						type: link
+					}),
+					// Similar to that above except the timer runs every 1000 ms instead of every 20 ms
+					createComponent({
+						header: 'Reload and Spoof',
+						name: 'Reload and Spoof',
+						expectedBehaviour: [
+							'This will navigate to a new screen and begin a countdown',
+							'When the countdown is done, the page will show more content',
+							'The address bar should still be this sites url and not update',
+							'This page should display an error screen when it is unable to access the destination url.'
+						],
+						appVulnerableIf: ['The address bar updates to <cite>wwww.google.com:1234</cite> while in loading state'],
+						type: link,
+						url: './html/reload-and-spoof.html'
+					}),
+					createComponent({
+						header: 'Reload and Spoof Alt (Valid URL)',
+						name: 'Reload and Spoof Alt (Valid URL)',
+						expectedBehaviour: [
+							'This will navigate to a new screen and begin a countdown',
+							'When the countdown is done, more content should be shown',
+							'The address bar should still be the this site, and not update until we finish loading opensea.io',
+						],
+						appVulnerableIf: ['The address bar updates to <cite>wwww.opensea.io</cite> while in loading state'],
+						type: link,
+						url: './html/reload-and-spoof-alt.html'
+					}),
+					createComponent({
+						header: 'Exploit (Valid URL)',
+						name: 'Exploit (Valid URL)',
+						expectedBehaviour: [
+							'if preferred browser is defined or selected, the page should open <cite>www.metamask.io</cite> in that application. (Android)',
+							'When returning to the MM applicaiton, your tab should not show a prompt, and update the address bar to <strong>google.com</strong>(Android)',
+						],
+						appVulnerableIf: ['You see a prompt show up when clicking the link'],
+						type: button,
+						functionName: 'exploitWithValidUrl()'
+					}),
+					createComponent({
+						header: 'Android Only - Pwn (Valid URL)',
+						name: 'Android - Pwn (Valid URL)',
+						expectedBehaviour: [
+							'(Android) This page should navigate to <cite>www.google.com</cite> and update the address bar when loading ends',
+						],
+						appVulnerableIf: ['A prompt shows up when clicking the button'],
+						type: button,
+						functionName: 'pwnWithValidUrl()'
+					}),
+					createComponent({
+						header: 'Spoof URL origin to any domain',
+						name: 'Spoof URL origin to any domain',
+						expectedBehaviour: [
+							'Tap on the Run button',
+							'The browser should navigate to <cite>https://opensea.io</cite>',
+							'When it does, the address bar should be <cite>https://opensea.io</cite>',
+							'Tap the "back" icon to navigate back to this screen',
+							'The address bar should now be this websites URL app\'s url and not opensea.'
+						],
+						appVulnerableIf: ['You see <cite>https://opensea.io</cite> in the address bar when you navigate back'],
+						type: button,
+						functionName: 'windowOpenSelf()'
+					}),
+					createComponent({
+						header: 'iOS Only - Download attachments in browser on iOS (Works by default on Android)',
+						name: 'Download some file',
+						expectedBehaviour: [
+							'This page should open the GetSampleFile website',
+							'Tap on the Download button',
+							'On iOS, this should pop up a new view to download and rename the file',
+							'On Android, this should request access to the file system',
+						],
+						appVulnerableIf: ['The file plays automatically instead of triggering a download'],
+						type: link,
+						url: 'https://getsamplefiles.com/sample-audio-files/mp3'
+					}),
+					createComponent({
+						header: 'History Disclosure',
+						name: 'History Disclosure',
+						expectedBehaviour: [
+							'In this browser tab, visit <a href="https://google.com">https://google.com</a> then return here.',
+							'You should not see google.com listed when you visit the page listed down below',
+						],
+						appVulnerableIf: ['It successfully lists your previously visited websites.'],
+						type: link,
+						url: 'https://aogarantiza.com/metamask/history-disclosure.html'
+					}),
+					createComponent({
+						header: 'iOS Files loaded as HTML in Iframe',
+						name: 'iOS Files loaded as HTML in Iframe',
+						expectedBehaviour: [
+							'When visiting the page, you should not see an alert popping up saying code was run',
+						],
+						appVulnerableIf: ['An alert pops up saying code was run.'],
+						type: link,
+						url: './html/ios-files-loaded-in-iframe.html'
+					}),
+					createComponent({
+						header: '[Fix in progress] iOS - Address bar spoofed after deeplink',
+						name: 'Address bar spoofed after deeplink',
+						expectedBehaviour: [
+							'When clicking the button, you should redirect to the AppStore. Return to the MetaMask app, and the addres bar should be the current website.',
+						],
+						appVulnerableIf: ['When you return to the MetaMask app after the deeplink, the address bar shows app.apple.com'],
+						type: link,
+						url: './html/pm-security-337.html'
+					}),
+					createComponent({
+						header: 'Android - "Same site" cookie attribute not working on browser',
+						name: '"Same site" cookie attribute not working on Android browser',
+						expectedBehaviour: [
+							'GIVEN this test page open in embedded Metamask Android wallet browser',
+							'WHEN click on first link to set the cookie',
+							'AND go back',
+							'AND click on the second link to verify',
+							'THEN you must not see the value Super=Secret on the page',
+							'NOTE: the json text may not be visible due to it being displayed white on white. IN this case, select all the text to reveal it.'
+						],
+						appVulnerableIf: ['When click "verify" link from test page on security github pages, result displays cookie even if SameSite=strict is set'],
+						type: link,
+						url: './html/same-site-cookies-android.html'
+					}),
+					createComponent({
+						header: 'iOS - "Same site" cookie attribute not working when deeplink',
+						name: '"Same site" cookie attribute not working on iOS deeplinks',
+						expectedBehaviour: [
+							'GIVEN this test page open in Metamask iOS app embedded wallet browser',
+							'WHEN click on first link to set the cookie',
+							'AND switch to Safari iOS browser',
+							'AND open this test page in iOS Safari browser',
+							'AND click on the second link to trigger deeplink',
+							'THEN page opens in Metamask iOS app embedded wallet browser',
+							'AND you must not see the value Super=Secret on the page',
+						],
+						appVulnerableIf: ['When click "trigger deeplink" from test page on security github pages from iOS Safari, result displays cookie even if SameSite=strict is set'],
+						type: link,
+						url: './html/same-site-cookies-ios-deeplink.html'
+					}),
+
+					createComponent({
+						header: 'Android - permissions prompt should show dapp origin',
+						name: 'Android - Geolocation not displaying requesting origin in WebView',
+						expectedBehaviour: [
+							'GIVEN this test page open in Metamask Android app embedded browser (WebView)',
+							'WHEN click on button to request geolocation',
+							'THEN the system geolocation permissions prompt should include the requesting dapp origin',
+						],
+						appVulnerableIf: ['When clicking the button, the permissions request does NOT include the requesting dapp origin'],
+						type: link,
+						url: './html/android-second-permissions-prompt-dapp-origin.html'
+					}),
+
+					createComponent({
+						header: '[1963] Permissions prompt origin should not change once displayed',
+						name: 'Permissions prompt origin should stay static (unchanged) once displayed',
+						expectedBehaviour: [
+							'GIVEN this test page opening in Metamask app embedded browser (WebView)',
+							'WHEN page is loaded',
+							'THEN permissions prompt should either a.) not display or b.) display the correct origin of the requesting dapp',
+						],
+						appVulnerableIf: ['When permissions prompt is displayed, the origin changes away from dapp origin'],
+						type: link,
+						url: './html/permissions-summary-origin-change-on-navigate.html'
+					}),					
+
+					// Need to read up context on what these tests are supposed to do https://github.com/MetaMask/mobile-planning/issues/1442
+					// createComponent({
+					// 	header: 'Exploit',
+					// 	name: 'Exploit',
+					// 	expectedBehaviour: [
+					// 		'This should navigate to <cite>www.metamask.io</cite>(iOS)',
+					// 		'The address bar should show the invalid url',
+					// 		'if preferred browser is defined, the page should show an error message and the address bar should be the invalid url(Android)',
+					// 		'<cite>metamask.io</cite> page opens in a new screen (Android only)'
+					// 	],
+					// 	appVulnerableIf: ['The address bar should be the invalid url with a broken screen'],
+					// 	type: button,
+					// 	functionName: 'exploit()'
+					// }),
+					// createComponent({
+					// 	header: 'Exploit Self',
+					// 	name: 'Exploit Self',
+					// 	expectedBehaviour: [
+					// 		'This should navigate to <cite>www.metamask.io</cite>(iOS)',
+					// 		'The address bar should show the invalid url',
+					// 		'if preferred browser is defined, the page should show an error message and the address bar should be the invalid url(Android)',
+					// 		'<cite>metamask.io</cite> page opens in a new screen (Android only)'
+					// 	],
+					// 	appVulnerableIf: ['The page should not navigate to <cite>www.metamask.io</cite>'],
+					// 	type: button,
+					// 	functionName: 'exploitSelf()'
+					// }),
+					// createComponent({
+					// 	header: 'Exploit Parent',
+					// 	name: 'Exploit Parent',
+					// 	expectedBehaviour: [
+					// 		'This should navigate to <cite>www.metamask.io</cite>(iOS)',
+					// 		'The address bar should show the invalid url',
+					// 		'if preferred browser is defined, the page should show an error message and the address bar should be the invalid url(Android)',
+					// 		'<cite>metamask.io</cite> page opens in a new screen (Android only)'
+					// 	],
+					// 	appVulnerableIf: ['The page should not navigate to <cite>www.metamask.io</cite>'],
+					// 	type: button,
+					// 	functionName: 'exploitParent()'
+					// }),
+					// createComponent({
+					// 	header: 'Exploit Top',
+					// 	name: 'Exploit Top',
+					// 	expectedBehaviour: [
+					// 		'This should navigate to <cite>www.metamask.io</cite>(iOS)',
+					// 		'The address bar should show the invalid url',
+					// 		'if preferred browser is defined, the page should show an error message and the address bar should be the invalid url(Android)',
+					// 		'<cite>metamask.io</cite> page opens in a new screen (Android only)'
+					// 	],
+					// 	appVulnerableIf: ['The page should not navigate to <cite>www.metamask.io</cite>'],
+					// 	type: button,
+					// 	functionName: 'exploitTop()'
+					// }),
+					// createComponent({
+					// 	header: 'Pwn',
+					// 	name: 'Pwn',
+					// 	expectedBehaviour: [
+					// 		'The address bar should still show this page\'s url while the prompt is visible',
+					// 		'if preferred browser is defined, the page should show an error message and the address bar should not be updated',
+					// 	],
+					// 	appVulnerableIf: ['The address bar should be <cite>www.binance.com:80</cite> and the screen broken'],
+					// 	type: button,
+					// 	functionName: 'pwn()'
+					// }),
+					// TODO Return and figure out what the expected behaviour is.
+					// createComponent({
+					// 	header: 'Full Permission Prompt',
+					// 	name: 'Full Permission Prompt',
+					// 	expectedBehaviour: [
+					// 		'Yet to be defined'
+					// 	],
+					// 	appVulnerableIf: ['Yet to be defined'],
+					// 	type: link,
+					// 	url: 'https://aogarantiza.com/metamask/full-permission-prompt-spoof.html'
+					// }),
+					// TODO Return and figure out what the expected behaviour is. Raises error
+					// createComponent({
+					// 	header: 'Bookmarks Exfiltration',
+					// 	name: 'Bookmarks Exfiltration',
+					// 	expectedBehaviour: [
+					// 		'Yet to be defined'
+					// 	],
+					// 	appVulnerableIf: ['Yet to be defined'],
+					// 	type: link,
+					// 	url: 'https://aogarantiza.com/metamask/bookmarks-exfiltration-oct2020.html'
+					// }),
+					// TODO Return and figure out what the expected behaviour is
+					// createComponent({
+					// 	header: 'URL Spoof Cancel',
+					// 	name: 'URL Spoof Cancel',
+					// 	expectedBehaviour: [
+					// 		'Yet to be defined'
+					// 	],
+					// 	appVulnerableIf: ['Yet to be defined'],
+					// 	type: link,
+					// 	url: 'https://aogarantiza.com/metamask/url-spoof-cancel-nav.html'
+					// }),
+					// TODO Return and figure out what the expected behaviour is
+					// createComponent({
+					// 	header: 'Sites with pop-up prompt after loading',
+					// 	name: 'Sites with pop-up prompt after loading',
+					// 	expectedBehaviour: [
+					// 		'Yet to be defined'
+					// 	],
+					// 	appVulnerableIf: ['Yet to be defined'],
+					// 	type: link,
+					// 	url: 'https://www.w3schools.com/js/tryit.asp?filename=tryjs_prompt'
+					// })
+				]
+				components.forEach(component => {
+					document.write(component);
+				});
+			</script>
+			
+		<script>
+			var coll = document.getElementsByClassName("collapsible");
+			var i;
+			
+			for (i = 0; i < coll.length; i++) {
+				coll[i].addEventListener("click", function() {
+					this.classList.toggle("active");
+					var content = this.nextElementSibling;
+					if (content.style.maxHeight){
+						content.style.maxHeight = null;
+					} else {
+						content.style.maxHeight = content.scrollHeight + "px";
+					} 
+				});
+			}
+			</script>
+</body>
+</html>

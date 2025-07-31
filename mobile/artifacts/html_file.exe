@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code execution example</title>
+</head>
+<body>
+    <h1>html_file.exe</h1>
+    <p>This is an exe file that MetaMask iOS will incorrectly interpret as HTML</p>
+
+    <script>
+        alert("Malicious code could run on this website!")
+    </script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<html>
+
+<head>
+  <script>
+    let geolocationPermissionSubmit;
+    let geolocationPermissionResult
+
+    document.addEventListener('DOMContentLoaded', () => {
+      geolocationPermissionResult = document.getElementById(
+        'geolocationPermissionResult',
+      );
+      geolocationPermissionSubmit = document.getElementById(
+        'geolocationPermissionSubmit',
+      );
+    })
+
+
+    function showPosition({ coords: { latitude, longitude } }) {
+      geolocationPermissionResult.innerHTML = `Latitude: ${latitude} <br> Longitude: ${longitude}`;
+    }
+
+    function showError(error) {
+      switch (error.code) {
+        case error.PERMISSION_DENIED:
+          geolocationPermissionResult.innerHTML =
+            'User denied the request for Geolocation.';
+          break;
+        case error.POSITION_UNAVAILABLE:
+          geolocationPermissionResult.innerHTML =
+            'Location information is unavailable.';
+          break;
+        case error.TIMEOUT:
+          geolocationPermissionResult.innerHTML = 'The request to get user location timed out.';
+          break;
+        case error.UNKNOWN_ERROR:
+          geolocationPermissionResult.innerHTML = 'An unknown error occurred.';
+          break;
+        default:
+          geolocationPermissionResult.innerHTML = 'An unknown error occurred.';
+          break;
+      }
+    }
+
+    function report(state) {
+      console.log(`Permission ${state}`);
+    }
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        geolocationPermissionResult.innerHTML = 'Requesting location...';
+        navigator.geolocation.getCurrentPosition(showPosition, showError);
+      } else {
+        geolocationPermissionResult.innerHTML =
+          'Geolocation is not supported by this browser.';
+      }
+    }
+
+    /**
+     * Geolcoation Permission Request
+     */
+    const handleRequest = async () => {
+      setTimeout(getLocation, 2000); // 2000 milliseconds = 2 seconds
+    };
+  </script>
+</head>
+
+<body>
+  <h1>WebView Permissions Prompt with Origin</h1>
+
+  <div class="row d-flex justify-content-center">
+    <div class="col-xl-4 col-lg-6 col-md-12 col-sm-12 col-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">
+            Android - permissions prompt should show dapp origin
+          </h4>
+          <button onclick="handleRequest()" class="btn btn-primary btn-lg btn-block mb-3"
+            id="geolocationPermissionSubmit">
+            Request Permission
+          </button>
+          <p class="info-text alert alert-warning">
+            Result:
+            <span id="geolocationPermissionResult"></span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

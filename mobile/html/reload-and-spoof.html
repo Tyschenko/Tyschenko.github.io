@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script>
+        var spoof = function(){
+            setInterval(function(){
+                document.location="https://google.com:1234";
+                document.title="Hacked Google";
+                document.write("This is not Google, contents are in attacker control");
+            },1000);
+        };
+      </script>
+</head>
+<body>
+    <p id="display"></p>
+    <script>
+        var countdowntime = 4;
+        var countdowntimer = setInterval(function(){
+            countdowntime--;
+            document.getElementById("display").innerHTML = `This page will redirect in ${countdowntime} seconds`;
+            if(countdowntime == 0){
+                clearInterval(countdowntimer);
+                spoof();
+            }
+        },1000);
+      </script>
+    </script>
+</body>
+</html>

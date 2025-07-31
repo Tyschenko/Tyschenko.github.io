@@ -1,0 +1,9 @@
+<ol>
+    <li>Open this page in Metamask iOS embedded browser</li>
+    <li><a href="https://httpbin.org/response-headers?set-cookie=Super=Secret;SameSite=Strict">First click to set Same-Site Cookie</a></li>
+    <li>Open this page in Safari iOS browser</li>
+    <li><a href="https://metamask.app.link/dapp/httpbin.org/headers">Then trigger deeplink</a></li>
+</ol>
+
+<p>If the browser is applying the SameSite Cookies strict policy, you won't find the <pre>Super=Secret</pre> cookie in httpbin request header on step 4</p>
+<p>Learn more on this on Github issue <a href="https://github.com/MetaMask/pm-security/issues/255">IOS same site "strict" cookie attribute bypassed by deeplink #255</a></p>
